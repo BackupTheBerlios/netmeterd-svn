@@ -4,7 +4,7 @@
 #define _IFACE_H
 
 #include <string>
-#include "counter.h"
+#include "counter.hpp"
 
 
 
