@@ -74,7 +74,7 @@ iface::iface(const std::string &name)
   time(&mytime);
   times = localtime(&mytime);
   this->date.day = times->tm_mday;
-  this->date.month = times->tm_mon;
+  this->date.month = times->tm_mon+1;
   this->date.year = times->tm_year+1900;
   this->lastUp = this->lastDown = 0;
 
@@ -267,12 +267,12 @@ bool iface::renew()
   struct tm *times;
   time(&mytime);
   times = localtime(&mytime);
-  if (this->date.day != times->tm_mday || this->date.month != times->tm_mon \
+  if (this->date.day != times->tm_mday || this->date.month != times->tm_mon+1 \
       || this->date.year != times->tm_year+1900)
   {  
     this->save();
     this->date.day = times->tm_mday;
-    this->date.month = times->tm_mon;
+    this->date.month = times->tm_mon+1;
     this->date.year = times->tm_year+1900;
     this->count.reset();
     return true;
