@@ -13,8 +13,8 @@ class counter:
           'KB': 1, 'MB': 2, 'GB': 3, 'TB': 4,
           'PB': 5, 'HB': 6 }
   
-  def __init__(self,count=0,unit=0):
-    self.count = count
+  def __init__(self,count=0.0,unit=0):
+    self.count = float(count)
     try:
       unit.isdigit()
       self.unit = counter.units[unit]
@@ -32,7 +32,7 @@ class counter:
     if self.unit == other.unit:
       return self.count > other.count
     elif self.unit > other.unit:
-      return self.count/(1024**other.unit-self.unit) > other.count
+      return self.count/(1024**self.unit-other.unit) > other.count
     elif other.unit > self.unit:
       return self.count > other.count/(1024**other.unit-self.unit)
   def __lt__(self,other):
@@ -148,15 +148,15 @@ def getTheBiggest(ifaces):
   value = counter(0,0)
   for iface in ifaces.keys():
     for date in ifaces[iface].keys():
-        #if ifaces[iface][date][i] > value:
-        print ifaces[iface][date]
-        #  value = ifaces[iface][date][i]
+      for i in 0,1:    
+        if ifaces[iface][date][i] > value:
+          value = ifaces[iface][date][i]
   return value
       
 def createHTML(ifaces,templatedir,template,outdir,type):
 
   max = getTheBiggest(ifaces)
-  #print max
+  print max
   pass
 
 def main():
