@@ -3,7 +3,7 @@
 #include "counter.h"
 #include <cmath>
 
-char *units[]= { "Bytes","Kilobytes","Megabytes","Gigabytes", "Terabytes","Petabytes","Hexabytes"};
+//char *units[]= { "Bytes","Kilobytes","Megabytes","Gigabytes", "Terabytes","Petabytes","Hexabytes"};
 
 counter::counter(double count, short int unit)
 {

@@ -12,7 +12,7 @@ class counter
   public:
    
     
-    enum Units {B,KB,MB,GB,TB,PT,HB};
+    static enum Unit_t {B,KB,MB,GB,TB,PT,HB} Units;
   
     counter(double count=0, short int unit=0);
     counter(const counter &source);

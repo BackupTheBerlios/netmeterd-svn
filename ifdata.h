@@ -14,14 +14,14 @@ class ifdata
     
     ifdata(counter sup, counter sdown);
     ifdata(const ifdata &source);
-    ifdata(double upcount, short int upunit, double downcount, double downunit);
-    //~ifdata();
-    void setUp(const counter &sup);
-    void setDown(const counter &sdown);
-    counter up();
-    counter up() const;
-    counter down();
-    counter down() const;
+    ifdata(double upcount, short int upunit, double downcount, short int downunit);
+    inline ~ifdata(){};
+    inline void setUp(const counter &sup){ Up = sup;};
+    inline void setDown(const counter & sdown){ Down = sdown;};
+    inline counter up(){ return Up;};
+    inline counter up() const{ return Up;};
+    inline counter down(){ return Down;};
+    inline counter down() const{ return Down;};
     const ifdata operator+(const ifdata &add);
     const ifdata operator=(const ifdata &source);
   private:
