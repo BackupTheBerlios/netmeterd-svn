@@ -17,7 +17,7 @@
 
 
 //Static members
-std::string iface::logdir=".";
+std::string iface::logdir=LOGDIR;
 
 
 std::string trim(std::string str)
