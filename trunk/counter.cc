@@ -5,20 +5,21 @@
 
 #include <iostream>
 
-counter::counter(double theup, sint theupunit, double thedown, sint thedownunit)
+counter::counter(double up, sint upunit, \
+                double down, sint downunit)
 {
-  up = theup;
-  upunit = theupunit;
-  down = thedown;
-  downunit = thedownunit;
+  this->up = up;
+  this->upunit = upunit;
+  this->down = down;
+  this->downunit = downunit;
   
   if (up >= 1024 || down >= 1024) reduce();
 }
 
 counter::counter()
 {
-  up = down = 0;
-  upunit = downunit = 0;
+  this->up = this->down = 0;
+  this->upunit = this->downunit = 0;
 }
 
 counter::counter(const counter &source)
@@ -29,15 +30,17 @@ counter::counter(const counter &source)
 
 void counter::reduce()
 {
-  while (up >= 1024 && upunit <= counter::HB)
+  while (this->up >= 1024 && \
+        this->upunit <= counter::HB)
   {
-    up/=1024;
-    upunit++;
+    this->up/=1024;
+    this->upunit++;
   }
-  while (down >= 1024 && downunit <= counter::HB)
+  while (this->down >= 1024 && \
+        this->downunit <= counter::HB)
   {
-    down/=1024;
-    downunit++;
+    this->down/=1024;
+    this->downunit++;
   }
 }
 
@@ -46,40 +49,40 @@ counter counter::operator+(const counter &add)
 {
   counter aux;
   //First, the up
-  if (upunit == add.upunit)
+  if (this->upunit == add.upunit)
   {
-    aux.up = up+add.up;
-    aux.upunit = upunit;
+    aux.up = this->up+add.up;
+    aux.upunit = this->upunit;
   }
   else
-    if (upunit > add.upunit)
+    if (this->upunit > add.upunit)
     {
-      aux.up = up*pow(1024,(upunit-add.upunit))+add.up;
+      aux.up = this->up*pow(1024,(this->upunit-add.upunit))+add.up;
       aux.upunit = add.upunit;
     }
     else
-    if (add.upunit > upunit)
+    if (add.upunit > this->upunit)
     {
-      aux.up = up+add.up*pow(1024,(add.upunit-upunit));
-      aux.upunit = upunit;
+      aux.up = this->up+add.up*pow(1024,(add.upunit-this->upunit));
+      aux.upunit = this->upunit;
     }
   //Now the down
-  if (downunit == add.downunit)
+  if (this->downunit == add.downunit)
   {
-    aux.down = down+add.down;
-    aux.downunit = downunit;
+    aux.down = this->down+add.down;
+    aux.downunit = this->downunit;
   }
   else
-    if (downunit > add.downunit)
+    if (this->downunit > add.downunit)
     {
-      aux.down = down*pow(1024,(downunit-add.downunit))+add.down;
+      aux.down = this->down*pow(1024,(this->downunit-add.downunit))+add.down;
       aux.downunit = add.downunit;
     }
     else
-      if (add.downunit > downunit)
+      if (add.downunit > this->downunit)
       {
-        aux.down = down+add.down*pow(1024,(add.downunit-downunit));
-        aux.downunit = downunit;
+        aux.down = this->down+add.down*pow(1024,(add.downunit-this->downunit));
+        aux.downunit = this->downunit;
       }
   
   if (aux.upunit >= 1024 || aux.downunit >= 1024)
@@ -90,10 +93,10 @@ counter counter::operator+(const counter &add)
 void counter::operator=(const counter &source)
 {
  
- up = source.up;
- upunit = source.upunit;
- down = source.down;
- downunit = source.downunit;
+ this->up = source.up;
+ this->upunit = source.upunit;
+ this->down = source.down;
+ this->downunit = source.downunit;
   
 }
 
