@@ -19,15 +19,6 @@ struct Date
   int day, month, year; //self explanatory
 };
 
-struct Method
-{
-  sint type; //file or DB
-  std::string data; //path or user:pass@host/db
-};
-
-enum methods {FS,BD};
-
-
 class iface
 {  
   friend std::ostream &operator<<(std::ostream &, const iface &);
@@ -38,7 +29,9 @@ class iface
     iface(const iface &);
     iface(const std::string &);
     iface();
-    //~iface();
+    std::string getName() { return this->name;};
+    std::string getLogdir() { return this->logdir;};
+    void setLogdir(const std::string &logdir) { this->logdir=logdir;};
     bool load();
     //Modifies: Load the iface initial values using the supplied method
     //Returns: True on success or false on error
