@@ -4,7 +4,6 @@
 #include <fstream>
 #include <cstdlib>
 #include "iface.h"
-#include <vector>
 
 #include <iostream>
 
@@ -146,11 +145,9 @@ void iface::update()
     fd >> aux;
     fd.close();
     bytesup = atof(aux.c_str());
-    cout << aux << ":";
     path = "/sys/class/net/"+name+"/statistics/rx_bytes";
     fd.open(path.c_str(),ios::in);
     fd >> aux;
-    cout << aux << endl;
     fd.close();
     bytesdown = atof(aux.c_str());
   }
@@ -196,9 +193,9 @@ void iface::update()
   if ( bytesup && bytesdown && lastUp && lastDown)
   {
     counter tmp(bytesup-lastUp,0,bytesdown-lastDown,0);
-    count += tmp;
+    count+=tmp;
     if (count.getUp() >= 1024 || count.getDown() >= 1024);
-      //count.reduce();
+      count.reduce();
   }
   lastUp = bytesup;
   lastDown = bytesdown;
