@@ -1,4 +1,5 @@
+.PHONY: all clean
 all: main
 main: iface.o counter.o
 clean: 
-	rm -f main *.o
+	${RM} main *.o
