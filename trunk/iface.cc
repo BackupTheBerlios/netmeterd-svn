@@ -35,7 +35,7 @@ iface::iface()
   delete [] times;
 }
 
-*bool iface::load(const method &access)
+/*bool iface::load(const method &access)
 {
   if (access.type == FS)
     string path = access.data+itoa(day)+;
@@ -44,7 +44,7 @@ iface::iface()
   ifstream f(path.c_str());
 
 }
-
+*/
 void iface::update()
 {
 
@@ -79,7 +79,7 @@ void iface::update()
   while (getline(file,temp)) { //read data from file
     if (line>=2) { //First 2 lines are headers
 
-      if (trim(temp.substr(0,temp.find(':',0)) == name)) { // is the correct device?
+      if (trim(temp.substr(0,temp.find(':',0))) == name) { // is the correct device?
         found=true;
         temp=trim(temp.substr(temp.find(':',0)+1,temp.size()-temp.find(':',0)-2)); //only get from ':'
         for(int pos=0;pos<temp.size();pos++) {
