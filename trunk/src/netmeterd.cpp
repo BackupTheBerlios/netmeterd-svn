@@ -13,6 +13,10 @@
 #include "counter.hpp"
 #include "iface.hpp"
 
+#ifndef LOGDIR
+  #define LOGDIR "/var/log/netmeterd"
+#endif
+
 std::vector <iface> ifaces;
 
 void help()
