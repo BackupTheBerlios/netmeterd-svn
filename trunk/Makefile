@@ -1,4 +1,4 @@
-VERSION = 0.1
+VERSION = "\"0.1\""
 EXE = netmeterd
 RELNAME = $(EXE)-$(VERSION)
 CXX = g++
@@ -11,7 +11,7 @@ ifeq ($(KV),2.6)
 endif
 
 ifeq ($(LOGDIR),)
-	LOGDIR = /var/log/netmeterd
+	LOGDIR = "\"/var/log/netmeterd\""
 endif
 
 ifeq ($(INSDIR),)
@@ -29,7 +29,7 @@ iface.o: iface.cc
 	$(CXX) -c $(CXXFLAGS) -DLOGDIR=$(LOGDIR) $^ -o $@
 	
 $(EXE): $(SOURCES)
-	$(CXX) $(CXXFLAGS) -DVERSION=$(VERSION) $^ -o $@
+	$(CXX) $(CXXFLAGS) -DVERSION=$(VERSION) -DLOGDIR=$(LOGDIR) $^ -o $@
 
 install:
 	install -d $(LOGDIR)
@@ -38,6 +38,6 @@ install:
 
 dist:
 	mkdir $(RELNAME)
-	cp *.cc *.h LICENSE ChangeLog $(RELNAME)
+	cp *.cc *.h LICENSE ChangeLog Makefile $(RELNAME)
 	tar cvvjf $(RELNAME).tar.bz2 $(RELNAME)
 	${RM} -r $(RELNAME)
