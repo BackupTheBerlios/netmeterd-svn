@@ -13,13 +13,13 @@ int main(int arg, char **argv){
   access.data = "";
   iface a(argv[1]);
   a.load(access);
-  for (int i=0;i<10;i++)
+  for (int i=0;i<atoi(argv[2]);i++)
   {
     sleep(1);
     cout << a << endl;
     a.update();
-    a.save(access);
   }
+  a.save(access);
   return 0;
   
 }

@@ -4,10 +4,9 @@
 #include <fstream>
 #include <cstdlib>
 #include "iface.h"
+#include <vector>
 
 #include <iostream>
-
-char *units[] = { "B","KB","MB","GB","TB","PB","HB"};
 
 string trim(string str)
 {
@@ -60,7 +59,7 @@ iface::iface()
 bool iface::load(const Method &access)
 {
   string buf,path;
-  int pos,st,end;
+  int pos;
   
   if (access.type == FS)
     path = access.data+itoa(date.month)+'-'+itoa(date.year);
@@ -70,41 +69,33 @@ bool iface::load(const Method &access)
   if ((pos = ifind(path)) < 0) return true;
   ifstream fd (path.c_str());
   fd.seekg(pos);
-  fd >> buf;
-  st = buf.find('=',0)+1;
-  end = buf.find(',',0);
-  count.setUp(atof(buf.substr(st,end-st).c_str()));
-  st = end+1;
-  end = buf.find(',',st);
-  count.setUpUnit(atoi(buf.substr(st,end-st).c_str()));
-  st = end+1;
-  end = buf.find(',',st);
-  count.setDown(atof(buf.substr(st,end-st).c_str()));
-  st = end+1;
-  end = buf.find(',',st);
-  count.setDownUnit(atoi(buf.substr(st,end-st).c_str()));
+  fd >> *this;
   fd.close();
   return true;
 }
 
 bool iface::save(const Method &access)
 {
-  string buf,path;
+  string path;
   int pos;
-  ofstream fd;
+  fstream fd;
+  
   if (access.type == FS)
     path = access.data+itoa(date.month)+'-'+itoa(date.year);
     path = "ifaces.txt"; //DEBUG
     pos = ifind(path);
-    fd.open(path.c_str(),ios::trunc);
-    fd.seekp(pos);
-    std::cout << fd.tellp() << endl;
-    std::cout << "guardando\n";
-    //fd << name << '=' << count.getUp() << ',' << count.getUpUnit()
-    //<< ',' << count.getDown() << ',' << count.getDownUnit() << endl;
-    fd << name << '=' << 0 << ',' << 0
-    << ',' << 0 << ',' << 0 << endl;
-    fd << "MIERDA";
+    if (pos >= 0)
+    {
+      fd.open(path.c_str(),ios::in|ios::out);
+      fd.seekp(pos);
+      fd << endl << *this;
+    }
+    else if (pos == -3)
+          {
+            fd.open(path.c_str(),ios::out);
+            fd << '[' << date.day << ']'
+               << endl << *this << endl;
+          }
     fd.close();
  
   return true;
@@ -155,9 +146,11 @@ void iface::update()
     fd >> aux;
     fd.close();
     bytesup = atof(aux.c_str());
+    cout << aux << ":";
     path = "/sys/class/net/"+name+"/statistics/rx_bytes";
     fd.open(path.c_str(),ios::in);
     fd >> aux;
+    cout << aux << endl;
     fd.close();
     bytesdown = atof(aux.c_str());
   }
@@ -204,8 +197,8 @@ void iface::update()
   {
     counter tmp(bytesup-lastUp,0,bytesdown-lastDown,0);
     count += tmp;
-    if (count.getUp() >= 1024 || count.getDown() >= 1024)
-      count.reduce();
+    if (count.getUp() >= 1024 || count.getDown() >= 1024);
+      //count.reduce();
   }
   lastUp = bytesup;
   lastDown = bytesdown;
@@ -233,8 +226,32 @@ bool iface::shouldRenew()
 
 ostream &operator<<(ostream &out,const iface &oface)
 {
- out << "Iface: " << oface.name << endl << "TX: " << oface.count.getUp() << " " << units[oface.count.getUpUnit()] << endl << "RX: " << oface.count.getDown() << " " << units[oface.count.getDownUnit()];
+ out << oface.name << '=' << oface.count.getUp() << ","
+ << oface.count.getUpUnit() << "," << oface.count.getDown() 
+ << "," << oface.count.getDownUnit();
  return out;
 }
 
+istream &operator>>(istream &in, iface &inface)
+{
+  string buf;
+  in >> buf;
+  int st=0,end;
+  end = buf.find('=',0)-1;
+  inface.name = buf.substr(0,end);
+  st = buf.find('=',0)+1;
+  end = buf.find(',',0);
+  inface.count.setUp(atof(buf.substr(st,end-st).c_str()));
+  st = end+1;
+  end = buf.find(',',st);
+  inface.count.setUpUnit(atoi(buf.substr(st,end-st).c_str()));
+  st = end+1;
+  end = buf.find(',',st);
+  inface.count.setDown(atof(buf.substr(st,end-st).c_str()));
+  st = end+1;
+  end = buf.find(',',st);
+  inface.count.setDownUnit(atoi(buf.substr(st,end-st).c_str()));
+  return in;
+}
+                          
 

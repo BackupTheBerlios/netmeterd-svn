@@ -31,6 +31,7 @@ using namespace std;
 class iface
 {  
   friend ostream &operator<<(ostream &, const iface &);
+  friend istream &operator>>(istream &, iface &);
   
   public:
     iface(const string &, const counter &, const Date &);
