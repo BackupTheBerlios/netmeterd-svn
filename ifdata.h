@@ -14,6 +14,7 @@ class ifdata
     
     ifdata(counter sup, counter sdown);
     ifdata(const ifdata & source);
+    ifdata(double upcount, short int upunit, double downcount, double downunit);
     //~ifdata();
     void setUp(const counter & sup);
     void setDown(const counter & sdown);

@@ -14,6 +14,12 @@ ifdata::ifdata(const ifdata &source)
   ifdata(source.up(), source.down());
 }
 
+ifdata::ifdata(double upcount, short int upunit, double downcount, short int downunit)
+{
+  Up = counter up(upcount, upunit);
+  Down = counter down(downcount, downunit);
+}
+
 void ifdata::setUp(const counter &sup)
 {
   Up = sup;
