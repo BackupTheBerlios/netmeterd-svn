@@ -101,3 +101,4 @@ void counter::operator+=(const counter &add)
 {
   *this = *this+add;
 }
+
