@@ -90,9 +90,10 @@ bool iface::load(const Method &access)
   int pos;
   
   if (access.type == FS)
-    path = "log- " + access.data+itoa(date.month)+'-'+itoa(date.year);
+    path = access.data+"/log-"+itoa(date.month)+'-'+itoa(date.year);
   
   if ((pos = ifind(path)) < 0) return true;
+  cout << "Loadpos: " << pos << endl;
   ifstream fd (path.c_str());
   fd.seekg(pos);
   fd >> *this;
@@ -107,9 +108,9 @@ bool iface::save(const Method &access)
   fstream fd;
   
   if (access.type == FS)
-    path = "log-" + access.data+itoa(date.month)+'-'+itoa(date.year);
-    cout << path << endl;
+    path = access.data+"/log-"+itoa(date.month)+'-'+itoa(date.year);
     pos = ifind(path);
+    cout << "Savepos: " << pos << endl;
     if (pos >= 0)
     {
       fd.open(path.c_str(),ios::in|ios::out);
@@ -118,12 +119,11 @@ bool iface::save(const Method &access)
     }
     else
     {
-      if (pos == -2)
-        fd.open(path.c_str(),ios::out);
+      if (pos == -1)
+        fd.open(path.c_str(),ios::out|ios::app);
       else
-        if (pos == -1)
-          fd.open(path.c_str(),ios::out|ios::app);
-        fd << *this << endl;
+        fd.open(path.c_str(),ios::out);
+      fd << *this << endl;
     }
     fd.close();
  
@@ -258,9 +258,9 @@ istream &operator>>(istream &in, iface &inface)
   string buf0,buf1,buf2,buf3,buf4;
   in >> buf0 >>  inface.name >> buf1 
   >> buf2 >> buf3 >> buf4;
-  inface.count.setUp(atoi(buf1.c_str()));
+  inface.count.setUp(atof(buf1.c_str()));
   inface.count.setUpUnit(Unit(buf2));
-  inface.count.setDown(atoi(buf3.c_str()));
+  inface.count.setDown(atof(buf3.c_str()));
   inface.count.setDownUnit(Unit(buf4));
   return in;
 }
