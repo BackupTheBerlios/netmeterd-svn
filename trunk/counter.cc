@@ -85,9 +85,18 @@ counter counter::operator+(const counter &add)
   return aux;
 }
 
-counter counter::operator=(const counter &source)
+void counter::operator=(const counter &source)
 {
-  return counter(source);
+ up = source.up;
+ upunit = source.upunit;
+ down = source.down;
+ downunit = source.downunit;
+  
+}
+
+void counter::operator+=(const counter &add)
+{
+  *this = *this+add;
 }
 
 //For debbuging porpouses

@@ -75,14 +75,14 @@ void iface::update()
 
 #endif
 
-  counter tmp(bytesup-lastUp,NULL,bytesdown-lastDown,NULL);
+  counter tmp(bytesup-lastUp,0,bytesdown-lastDown,0);
   count += tmp;
   lastUp = bytesup;
   lastDown = bytesdown;
-  if (shouldRenew)
+  if (shouldRenew())
   {
-    save();
-    reset();
+    //save();
+    //reset();
   }
 
 }

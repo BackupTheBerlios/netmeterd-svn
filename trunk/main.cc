@@ -4,7 +4,11 @@
 
 int main(){
   
-  counter a(2348,2,2894345,4);
+  counter a(1,2,1,2);
+  counter b;
+  b=a;
+  a+=a;
   a.print();
+  b.print();
   return 0;
 }

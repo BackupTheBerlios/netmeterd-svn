@@ -17,7 +17,8 @@ class counter
     void reduce();
     void print();
     counter operator+(const counter &add);
-    counter operator=(const counter &source);
+    void operator=(const counter &source);
+    void operator+=(const counter &add);
   private:
     double up;
     sint upunit;
