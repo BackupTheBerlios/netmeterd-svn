@@ -5,7 +5,9 @@
 #include <cstdlib>
 #include "iface.h"
 
-char *units[] = { "B","KB","MB"};
+#include <iostream>
+
+char *units[] = { "B","KB","MB","GB","TB","PB","HB"};
 
 string trim(string str)
 {
@@ -39,6 +41,7 @@ iface::iface(const string &thename)
   date.day = times->tm_mday;
   date.month = times->tm_mon;
   date.year = times->tm_year;
+  lastUp = lastDown = 0;
 
 }
 
@@ -54,43 +57,85 @@ iface::iface()
   iface("");
 }
 
-bool iface::load(const method &access)
+bool iface::load(const Method &access)
 {
   string buf,path;
-  int st,end;
-  double up,down;
-  sint upunit,downunit;
-  bool found=false;
+  int pos,st,end;
   
   if (access.type == FS)
     path = access.data+itoa(date.month)+'-'+itoa(date.year);
-  else return false;
+  path = "ifaces.txt"; //DEBUG
+  //else return false;
   
+  if ((pos = ifind(path)) < 0) return true;
   ifstream fd (path.c_str());
-  if (!fd) return true;
-  
-  while (fd >> buf && !found)
-    if (buf == '['+itoa(date.day)+']') // we have found the day
-      while (fd >> buf && !found)
+  fd.seekg(pos);
+  fd >> buf;
+  st = buf.find('=',0)+1;
+  end = buf.find(',',0);
+  count.setUp(atof(buf.substr(st,end-st).c_str()));
+  st = end+1;
+  end = buf.find(',',st);
+  count.setUpUnit(atoi(buf.substr(st,end-st).c_str()));
+  st = end+1;
+  end = buf.find(',',st);
+  count.setDown(atof(buf.substr(st,end-st).c_str()));
+  st = end+1;
+  end = buf.find(',',st);
+  count.setDownUnit(atoi(buf.substr(st,end-st).c_str()));
+  fd.close();
+  return true;
+}
+
+bool iface::save(const Method &access)
+{
+  string buf,path;
+  int pos;
+  ofstream fd;
+  if (access.type == FS)
+    path = access.data+itoa(date.month)+'-'+itoa(date.year);
+    path = "ifaces.txt"; //DEBUG
+    pos = ifind(path);
+    fd.open(path.c_str(),ios::trunc);
+    fd.seekp(pos);
+    std::cout << fd.tellp() << endl;
+    std::cout << "guardando\n";
+    //fd << name << '=' << count.getUp() << ',' << count.getUpUnit()
+    //<< ',' << count.getDown() << ',' << count.getDownUnit() << endl;
+    fd << name << '=' << 0 << ',' << 0
+    << ',' << 0 << ',' << 0 << endl;
+    fd << "MIERDA";
+    fd.close();
+ 
+  return true;
+}
+int iface::ifind(const string &path)
+{
+  string buf;
+  int pos;
+  bool dayfound=false; 
+  ifstream fd(path.c_str());
+  fd.seekg(ios::beg);
+  if (!fd) return -3; //File not found
+  while ( fd >> buf)
+  {
+    dayfound=true;
+    if (buf == string("["+itoa(date.day)+"]")) // we have found the day
+      while (!fd.eof())
+      {
+        pos = fd.tellg();
+        fd >> buf;
         if (buf.find(name,0) != string::npos) //Yeah, we've got the iface too
         {
-          found = true;
-          st = buf.find('=',0)+1;
-          end = buf.find(',',0);
-          up = atof(buf.substr(st,end-st-1).c_str());
-          st = end+1;
-          end = buf.find(',',st);
-          upunit = atoi(buf.substr(st,end-st-1).c_str());
-          st = end+1;
-          end = buf.find(',',st);
-          down = atof(buf.substr(st,end-st-1).c_str());
-          st = end+1;
-          end = buf.find(',',st);
-          downunit = atoi(buf.substr(st,end-st-1).c_str());
-          counter tmp(up,upunit,down,downunit);
-          count = tmp;
-        } 
-    return true;
+          fd.close();
+          return pos;
+        }
+      } 
+  }  //We haven't find the iface :-(
+  
+  fd.close();
+  if (dayfound) return -1;
+  return -2;
 }
 
 void iface::update()
@@ -133,7 +178,7 @@ void iface::update()
       if (trim(temp.substr(0,temp.find(':',0))) == name) { // is the correct device?
         found=true;
         temp=trim(temp.substr(temp.find(':',0)+1,temp.size()-temp.find(':',0)-2)); //only get from ':'
-        for(int pos=0;pos<temp.size();pos++) {
+        for(unsigned int pos=0;pos<temp.size();pos++) {
           if (temp[pos]!=' ') {
             number=number*10 + (temp[pos] - '0');
             was_space=false;
@@ -155,11 +200,12 @@ void iface::update()
   if (!found) { lastDown=0; lastUp=0; }
 #endif
 
-  if ( bytesup && bytesdown)
+  if ( bytesup && bytesdown && lastUp && lastDown)
   {
     counter tmp(bytesup-lastUp,0,bytesdown-lastDown,0);
     count += tmp;
-    count.reduce();
+    if (count.getUp() >= 1024 || count.getDown() >= 1024)
+      count.reduce();
   }
   lastUp = bytesup;
   lastDown = bytesdown;

@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS += -Wall
+CXXFLAGS += -Wall -g
 SOURCES = counter.o iface.o main.cc
 EXE = main
 KERNEL_VERSION = $(shell uname -r|cut -d. -f 1-2)

@@ -21,7 +21,11 @@ class counter
     double getDown() const { return down;};
     sint getUpUnit() const { return upunit;};
     sint getDownUnit() const { return downunit;};
-  private:
+    void setUp(const double &sup) { up = sup;};
+    void setDown(const double &sdown) { down = sdown;};
+    void setUpUnit(const sint &supunit) { upunit = supunit;};
+    void setDownUnit(const sint &sdownunit) { downunit = sdownunit;};
+  //private:
     double up;
     sint upunit;
     double down;

@@ -9,6 +9,7 @@
 
 using namespace std;
 
+//Some usefull functions
 string trim (string);
 string itoa(const int &);
 
@@ -17,32 +18,38 @@ struct Date
   int day, month, year; //self explanatory
 };
 
-struct method
+struct Method
 {
   sint type; //file or DB
   string data; //path or user:pass@host/db
 };
 
-enum methods { FS,BD};
+enum methods {FS,BD};
 
 using namespace std;
 
 class iface
 {  
   friend ostream &operator<<(ostream &, const iface &);
+  
   public:
     iface(const string &, const counter &, const Date &);
-    //iface(const string &, const uint &, const sint &, const uint &, const sint &, const int &, const int &, const int &);
     iface(const iface &);
     iface(const string &);
     iface();
     //~iface();
-    bool load(const method &);
+    bool load(const Method &);
     //Modifies: Load the iface initial values using the supplied method
     //Returns: True on success or false on error
-    bool save(const method &);
+    bool save(const Method &);
     //Modifies: Saves the data using the supplied method
     //Returns: True on success or false on error
+    int ifind(const string &);
+    //Modifies: Nothing
+    //Returns: the position of teh interface in the file or -1 is not found
+    bool write(const string &, const  int &);
+    //Modifies: Writes the counter values to a file ina determinated position
+    //Returns:True on success, false on error
     void update();
     //Modifies: Updates the counter from /proc/net/dev or /sys/class/net/dev
     //Returns: Nothing
