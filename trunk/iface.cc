@@ -208,7 +208,7 @@ void iface::update()
     fd.close();
     bytesdown = atof(buf.c_str());
   }
-  else { bytesup=bytesdown=0;}
+  else { lastUp=lastDown=0;}
 #else
 
 // Implementation using /proc/net/dev
@@ -247,7 +247,7 @@ void iface::update()
   if (!found) { lastDown=0; lastUp=0; }
 #endif
 
-  if ( bytesup && bytesdown && lastUp && lastDown)
+  if (lastUp && lastDown)
   {
     counter tmp(bytesup-lastUp,0,bytesdown-lastDown,0);
     this->count+=tmp;
