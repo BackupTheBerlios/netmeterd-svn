@@ -4,7 +4,7 @@ EXE = main
 KERNEL_VERSION = $(shell uname -r|cut -d. -f 1-2)
 
 ifeq ($(KERNEL_VERSION),2.6)
-#  CXXFLAGS+= -DLINUX26
+  CXXFLAGS+= -DLINUX26
 endif
 
 $(EXE): $(SOURCES)
