@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
   while (true)
   {  
     //Update the ifaces
-    for (unsigned int i=0;i<names.size();i++)
+    for (unsigned int i=0;i<ifaces.size();i++)
     {
       ifaces[i].update();
       //Some verbosity for foreground runs
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
     //If save time has passed, save the ifaces
     if (time(0)-prevsave >= savetime*60)
     {
-      for (unsigned int i=0;i<names.size();i++)
+      for (unsigned int i=0;i<ifaces.size();i++)
       { 
         ifaces[i].save();
         //Some verbosity OMT
