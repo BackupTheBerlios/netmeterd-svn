@@ -7,13 +7,12 @@
 #include "counter.h"
 
 
-using namespace std;
 
 //Some usefull functions
-string trim (string);
-string itoa(const int &);
-string Unit(const sint &);
-sint Unit(const string &);
+std::string trim (std::string);
+std::string itoa(const int &);
+std::string Unit(const sint &);
+sint Unit(const std::string &);
 
 struct Date
 {
@@ -23,22 +22,21 @@ struct Date
 struct Method
 {
   sint type; //file or DB
-  string data; //path or user:pass@host/db
+  std::string data; //path or user:pass@host/db
 };
 
 enum methods {FS,BD};
 
-using namespace std;
 
 class iface
 {  
-  friend ostream &operator<<(ostream &, const iface &);
-  friend istream &operator>>(istream &, iface &);
+  friend std::ostream &operator<<(std::ostream &, const iface &);
+  friend std::istream &operator>>(std::istream &, iface &);
   
   public:
-    iface(const string &, const counter &, const Date &);
+    iface(const std::string &, const counter &, const Date &);
     iface(const iface &);
-    iface(const string &);
+    iface(const std::string &);
     iface();
     //~iface();
     bool load();
@@ -47,7 +45,7 @@ class iface
     bool save();
     //Modifies: Saves the data using the supplied method
     //Returns: True on success or false on error
-    int ifind(const string &);
+    int ifind(const std::string &);
     //Modifies: Nothing
     //Returns: the position of teh interface in the file or -1 is not found
     void update();
@@ -56,12 +54,12 @@ class iface
     bool renew();
     //Checks if day has changed and then, resets count and date
   private:
-    string name;
+    std::string name;
     counter count;
     double lastUp;
     double lastDown;
     Date date;
-    static string logdir;
+    static std::string logdir;
 };   
 #endif  
   
