@@ -2,8 +2,9 @@ VERSION = 0.1
 EXE = netmeterd
 RELNAME = $(EXE)-$(VERSION)
 CXX = g++
-CXXFLAGS += -Wall
-SOURCES = counter.o iface.o $(EXE).cc
+CXXFLAGS += -Wall 
+SOURCES = counter.cc iface.cc $(EXE).cc
+OBJS = $(SOURCES:.cc=.o)
 KV = $(shell uname -r|cut -d. -f 1-2)
 
 ifeq ($(KV),2.6)
@@ -25,11 +26,13 @@ all: $(EXE)
 clean: 
 	${RM} $(EXE) *.o *~
 
-iface.o: iface.cc
-	$(CXX) -c $(CXXFLAGS) -DLOGDIR="\"$(LOGDIR)\"" $^ -o $@
+%.o: %.cc
+	$(CXX) -c $(CXXFLAGS) -DVERSION=\"$(VERSION)\" \
+        -DLOGDIR="\"$(LOGDIR)\"" $^ -o $@
 	
-$(EXE): $(SOURCES)
-	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -DLOGDIR=\"$(LOGDIR)\" $^ -o $@
+$(EXE): $(OBJS)
+	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" \
+        -DLOGDIR=\"$(LOGDIR)\" $^ -o $@
 
 install:
 	install -d $(LOGDIR)
