@@ -5,6 +5,7 @@
 
 #include <string>
 #include "counter.h"
+#include "functions.h"
 
 using namespace std;
 

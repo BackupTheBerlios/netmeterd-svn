@@ -1,5 +1,5 @@
 CXX = g++
-SOURCES = counter.o iface.o main.cc
+SOURCES = counter.o iface.o main.cc functions.cc
 EXE = main
 KERNEL_VERSION = $(shell uname -r|cut -d. -f 1-2)
 

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cstdlib>
 #include "iface.h"
+#include "functions.h"
 
 
 
