@@ -40,6 +40,8 @@ class iface
     //Returns: Nothing
     bool shouldRenew();
     //Checks if day has changed and the counter need to be renewed
+    void reset();
+    //Puts the counter to 0
   private:
     string name;
     double lastUp,lastDown;

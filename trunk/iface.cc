@@ -35,16 +35,16 @@ iface::iface()
   delete [] times;
 }
 
-/*bool iface::load(const method &access)
+*bool iface::load(const method &access)
 {
-  if (access.type == iface::FILESYSTEM)
-    string path = access.data;
+  if (access.type == FS)
+    string path = access.data+itoa(day)+;
   else return false;
   
-  ifstream f(path+)day,(string));
+  ifstream f(path.c_str());
 
+}
 
-*/
 void iface::update()
 {
 
@@ -102,10 +102,11 @@ void iface::update()
   }
   if (!found) { lastDown=0; lastUp=0; }
 #endif
-
-
-  counter tmp(bytesup-lastUp,0,bytesdown-lastDown,0);
-  count += tmp;
+  if ( bytesup && bytesdown)
+  {
+    counter tmp(bytesup-lastUp,0,bytesdown-lastDown,0);
+    count += tmp;
+  }
   lastUp = bytesup;
   lastDown = bytesdown;
   if (shouldRenew())
@@ -115,6 +116,7 @@ void iface::update()
   }
 
 }
+
 bool iface::shouldRenew()
 {
   time_t mytime;
