@@ -19,10 +19,12 @@ string trim(string str)
 
 string itoa(const int &x)
 {
-  stringstream buf;
+  /*stringstream buf;
   buf << x << ends;
-  string tmp=buf.str();
-  return tmp;
+  return buf.str();*/
+  char buf[512];
+  sprintf(buf,"%d",x);
+  return static_cast<string> (buf);
 }
 
 string Unit(const sint &x)
@@ -65,7 +67,7 @@ iface::iface(const string &thename)
   times = localtime(&mytime);
   date.day = times->tm_mday;
   date.month = times->tm_mon;
-  date.year = times->tm_year;
+  date.year = times->tm_year+1900;
   lastUp = lastDown = 0;
 
 }
@@ -88,15 +90,11 @@ bool iface::load(const Method &access)
   int pos;
   
   if (access.type == FS)
-    path = access.data+itoa(date.month)+'-'+itoa(date.year);
-  path = "ifaces.txt"; //DEBUG
-  //else return false;
+    path = "log- " + access.data+itoa(date.month)+'-'+itoa(date.year);
   
   if ((pos = ifind(path)) < 0) return true;
   ifstream fd (path.c_str());
   fd.seekg(pos);
-  fd >> buf;
-  cout << buf;
   fd >> *this;
   fd.close();
   return true;
@@ -109,13 +107,13 @@ bool iface::save(const Method &access)
   fstream fd;
   
   if (access.type == FS)
-    path = access.data+itoa(date.month)+'-'+itoa(date.year);
-    path = "ifaces.txt"; //DEBUG
+    path = "log-" + access.data+itoa(date.month)+'-'+itoa(date.year);
+    cout << path << endl;
     pos = ifind(path);
     if (pos >= 0)
     {
       fd.open(path.c_str(),ios::in|ios::out);
-      fd.seekp(pos+1);
+      fd.seekp(pos);
       fd << *this << endl;
     }
     else
@@ -124,8 +122,11 @@ bool iface::save(const Method &access)
         fd.open(path.c_str(),ios::out);
       else
         if (pos == -1)
-          fd.open(path.c_str(),ios::app);
-      fd << *this << endl;
+        {
+          fd.open(path.c_str(),ios::out|ios::app);
+          cout << "app" << endl;
+          fd << *this << endl;
+        }
     }
     fd.close();
  
@@ -142,8 +143,6 @@ int iface::ifind(const string &path)
   {
     pos = fd.tellg();
     std::getline(fd,buf);
-    cout << "buf: " << buf << endl;
-    cout << buf.find("12",0) << endl;
     if ( buf.find(itoa(date.day),0) != string::npos  && buf.find(name,0) != string::npos) //We've got it
     {
       cout << pos << endl;
@@ -240,7 +239,7 @@ bool iface::shouldRenew()
   struct tm *times;
   time(&mytime);
   times = localtime(&mytime);
-  if (date.day != times->tm_mday || date.month != times->tm_mon || date.year != times->tm_year)
+  if (date.day != times->tm_mday || date.month != times->tm_mon || date.year != times->tm_year+1900)
   {  
     return true;
   }

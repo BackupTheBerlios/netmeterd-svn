@@ -66,6 +66,7 @@ class iface
     double lastUp;
     double lastDown;
     Date date;
+    static Method access;
 };   
 #endif  
   
