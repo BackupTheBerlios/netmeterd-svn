@@ -1,10 +1,12 @@
+VERSION = 0.1
 CXX = g++
 CXXFLAGS += -Wall
-SOURCES = counter.o iface.o main.cc
-EXE = main
-KERNEL_VERSION = $(shell uname -r|cut -d. -f 1-2)
+EXE = netmeterd
+SOURCES = counter.o iface.o $(EXE).cc
 
-ifeq ($(KERNEL_VERSION),2.6)
+KV = $(shell uname -r|cut -d. -f 1-2)
+
+ifeq ($(KV),2.6)
   CXXFLAGS += -DLINUX26
 endif
 
@@ -16,4 +18,4 @@ clean:
 	${RM} $(EXE) *.o
 
 $(EXE): $(SOURCES)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+	$(CXX) $(CXXFLAGS) -DVERSION=$(VERSION) $^ -o $@
