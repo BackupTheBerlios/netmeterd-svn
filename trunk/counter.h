@@ -7,7 +7,6 @@ typedef short int sint;
 
 class counter
 {
-  
   public:
     static enum Unit_t {B,KB,MB,GB,TB,PT,HB} Units;
   
@@ -15,10 +14,13 @@ class counter
     counter(const counter &source);
     counter();
     void reduce();
-    void print();
     counter operator+(const counter &add);
     void operator=(const counter &source);
     void operator+=(const counter &add);
+    double getUp() const { return up;};
+    double getDown() const { return down;};
+    sint getUpUnit() const { return upunit;};
+    sint getDownUnit() const { return downunit;};
   private:
     double up;
     sint upunit;

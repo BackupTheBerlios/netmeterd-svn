@@ -1,14 +1,20 @@
 //$Id$
 
+#include <iostream>
 #include "counter.h"
+#include "iface.h"
 
-int main(){
+using namespace std;
+
+int main(int arg, char **argv){
   
-  counter a(1,2,1,2);
-  counter b;
-  b=a;
-  a+=a;
-  a.print();
-  b.print();
+  iface a(argv[1]);
+  while (true)
+  {
+    sleep(1);
+    cout << a << endl;
+    a.update();
+  }
   return 0;
+  
 }

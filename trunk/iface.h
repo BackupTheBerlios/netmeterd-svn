@@ -5,11 +5,12 @@
 
 #include <string>
 #include "counter.h"
-#include "functions.h"
+
 
 using namespace std;
 
 string trim (string);
+string itoa(const int &);
 
 struct Date
 {
@@ -22,14 +23,18 @@ struct method
   string data; //path or user:pass@host/db
 };
 
+enum methods { FS,BD};
+
 using namespace std;
 
 class iface
 {  
+  friend ostream &operator<<(ostream &, const iface &);
   public:
     iface(const string &, const counter &, const Date &);
     //iface(const string &, const uint &, const sint &, const uint &, const sint &, const int &, const int &, const int &);
     iface(const iface &);
+    iface(const string &);
     iface();
     //~iface();
     bool load(const method &);

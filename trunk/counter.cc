@@ -98,9 +98,3 @@ void counter::operator+=(const counter &add)
 {
   *this = *this+add;
 }
-
-//For debbuging porpouses
-void counter::print()
-{
-  std::cout << "Up: " << up << "\nDown: " << down << "\nUpunit " << upunit << "\nDownunit: " << downunit << "\n";
-}
