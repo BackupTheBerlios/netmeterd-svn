@@ -8,7 +8,7 @@ typedef short int sint;
 class counter
 {
   public:
-    static enum Unit_t {B,KB,MB,GB,TB,PT,HB} Units;
+    static enum Unit_t {B,KB,MB,GB,TB,PB,HB} Units;
   
     counter(double , sint, double, sint);
     counter(const counter &source);
