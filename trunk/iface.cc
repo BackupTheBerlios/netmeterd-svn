@@ -3,6 +3,9 @@
 #include <ctime>
 #include <fstream>
 #include <cstdlib>
+#include <vector>
+#include <sstream>
+
 #include "iface.h"
 
 #include <iostream>
@@ -16,9 +19,33 @@ string trim(string str)
 
 string itoa(const int &x)
 {
-  char buf[256];
-  sprintf(buf,"%d",x);
-  return static_cast <string> (buf);
+  stringstream buf;
+  buf << x << ends;
+  string tmp=buf.str();
+  return tmp;
+}
+
+string Unit(const sint &x)
+{
+  vector <string> units(7);
+  units[0]="B";units[1]="KB";units[2]="MB";units[3]="GB";
+  units[4]="TB";units[5]="PB";units[6]="HB";
+  if (x < sint(units.size()))
+    return units[x];
+  return "E";
+}
+
+sint Unit(const string &str)
+{
+  vector <string> units(7);
+  units[0]="B";units[1]="KB";units[2]="MB";units[3]="GB";
+  units[4]="TB";units[5]="PB";units[6]="HB";
+
+  for (sint i=0;i<sint(units.size());i++)
+    if (units[i] == str)
+      return i;
+  
+  return -1;
 }
 
 iface::iface(const string &thename, const counter &thecount, const Date &thedate)
@@ -68,6 +95,8 @@ bool iface::load(const Method &access)
   if ((pos = ifind(path)) < 0) return true;
   ifstream fd (path.c_str());
   fd.seekg(pos);
+  fd >> buf;
+  cout << buf;
   fd >> *this;
   fd.close();
   return true;
@@ -86,15 +115,18 @@ bool iface::save(const Method &access)
     if (pos >= 0)
     {
       fd.open(path.c_str(),ios::in|ios::out);
-      fd.seekp(pos);
-      fd << endl << *this;
+      fd.seekp(pos+1);
+      fd << *this << endl;
     }
-    else if (pos == -3)
-          {
-            fd.open(path.c_str(),ios::out);
-            fd << '[' << date.day << ']'
-               << endl << *this << endl;
-          }
+    else
+    {
+      if (pos == -2)
+        fd.open(path.c_str(),ios::out);
+      else
+        if (pos == -1)
+          fd.open(path.c_str(),ios::app);
+      fd << *this << endl;
+    }
     fd.close();
  
   return true;
@@ -103,29 +135,24 @@ int iface::ifind(const string &path)
 {
   string buf;
   int pos;
-  bool dayfound=false; 
   ifstream fd(path.c_str());
   fd.seekg(ios::beg);
-  if (!fd) return -3; //File not found
-  while ( fd >> buf)
+  if (!fd) return -2; //File not found
+  while (!fd.eof())
   {
-    dayfound=true;
-    if (buf == string("["+itoa(date.day)+"]")) // we have found the day
-      while (!fd.eof())
-      {
-        pos = fd.tellg();
-        fd >> buf;
-        if (buf.find(name,0) != string::npos) //Yeah, we've got the iface too
-        {
-          fd.close();
-          return pos;
-        }
-      } 
-  }  //We haven't find the iface :-(
-  
+    pos = fd.tellg();
+    std::getline(fd,buf);
+    cout << "buf: " << buf << endl;
+    cout << buf.find("12",0) << endl;
+    if ( buf.find(itoa(date.day),0) != string::npos  && buf.find(name,0) != string::npos) //We've got it
+    {
+      cout << pos << endl;
+      return pos;
+    }
+  }
+ //We haven't find the iface :-(  
   fd.close();
-  if (dayfound) return -1;
-  return -2;
+  return -1;
 }
 
 void iface::update()
@@ -223,31 +250,22 @@ bool iface::shouldRenew()
 
 ostream &operator<<(ostream &out,const iface &oface)
 {
- out << oface.name << '=' << oface.count.getUp() << ","
- << oface.count.getUpUnit() << "," << oface.count.getDown() 
- << "," << oface.count.getDownUnit();
+ out << oface.date.day << " " << oface.name << " "
+ << oface.count.getUp() << " " << Unit(oface.count.getUpUnit())
+ << " " << oface.count.getDown() << " "
+ << Unit(oface.count.getDownUnit());
  return out;
 }
 
 istream &operator>>(istream &in, iface &inface)
 {
-  string buf;
-  in >> buf;
-  int st=0,end;
-  end = buf.find('=',0)-1;
-  inface.name = buf.substr(0,end);
-  st = buf.find('=',0)+1;
-  end = buf.find(',',0);
-  inface.count.setUp(atof(buf.substr(st,end-st).c_str()));
-  st = end+1;
-  end = buf.find(',',st);
-  inface.count.setUpUnit(atoi(buf.substr(st,end-st).c_str()));
-  st = end+1;
-  end = buf.find(',',st);
-  inface.count.setDown(atof(buf.substr(st,end-st).c_str()));
-  st = end+1;
-  end = buf.find(',',st);
-  inface.count.setDownUnit(atoi(buf.substr(st,end-st).c_str()));
+  string buf0,buf1,buf2,buf3,buf4;
+  in >> buf0 >>  inface.name >> buf1 
+  >> buf2 >> buf3 >> buf4;
+  inface.count.setUp(atoi(buf1.c_str()));
+  inface.count.setUpUnit(Unit(buf2));
+  inface.count.setDown(atoi(buf3.c_str()));
+  inface.count.setDownUnit(Unit(buf4));
   return in;
 }
                           
