@@ -10,8 +10,12 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "counter.h"
-#include "iface.h"
+#include "counter.hpp"
+#include "iface.hpp"
+
+#ifndef LOGDIR
+#define LOGDIR "/var/log/netmeterd"
+#endif
 
 std::vector <iface> ifaces;
 
