@@ -241,8 +241,8 @@ void iface::update()
           }
         }
       }
-      line++; j=1;
     }
+    line++; j=1;
   }
   if (!found) { lastDown=0; lastUp=0; }
 #endif
