@@ -1,9 +1,7 @@
 //$Id$
 
-#include "counter.h"
+#include "counter.hpp"
 #include <cmath>
-
-#include <iostream>
 
 counter::counter(double up, sint upunit, \
                 double down, sint downunit)

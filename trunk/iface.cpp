@@ -6,7 +6,7 @@
 #include <vector>
 #include <sstream>
 
-#include "iface.h"
+#include "iface.hpp"
 
 #include <iostream>
 
