@@ -1,3 +1,10 @@
+*2004-05-15 Skyhusker
+  Iface and counter class are ready (at least for the upcoming 0.1 release)
+  netmeterd.cc is almost ready, we only need to write signal handlers
+  and the main loop
+  Bad news, Ayoze is out of home this weekend and I have and exam
+  on Wednesday 19, so don't expect 0.1 till 21 at least
+
 *2004-05-12 Skyhusker
   After some days of intensive work, we'll release a usable version soon
 
