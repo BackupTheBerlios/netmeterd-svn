@@ -13,6 +13,8 @@
 #include "counter.h"
 #include "iface.h"
 
+std::vector <iface> ifaces;
+
 void help()
 {
   std::cout << "Netmeterd Version " << VERSION << std::endl
@@ -53,7 +55,8 @@ std::vector <std::string> getNames (const std::string &interfaces)
 void quit(int sig){
   std::cout << "Signal " << sig << " received" << std::endl;
   std::cout << "Saving status of ifaces" << std::endl;
-  
+  for (unsigned int i=0;i<ifaces.size();i++)
+    ifaces[i].save();
   std::cout << "Exiting..." << std::endl;
   exit(1);
 }
@@ -68,7 +71,6 @@ int main(int argc, char *argv[])
   extern char *optarg;
   struct stat statBuf;
   std::string logdir="",interfaces="";
-  std::vector <iface> ifaces;
   std::vector <std::string> names; 
   struct sigaction action;
 
