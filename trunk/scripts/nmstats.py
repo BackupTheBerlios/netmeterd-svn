@@ -1,10 +1,25 @@
 #!/usr/bin/env python
-
+# -*- coding: ISO8859-15 -*-
 #$Id$
 
-import sys,getopt,exceptions,time
+
+import sys,getopt,exceptions,time,os
 
 def help():
+  revision = '$Rev$'
+  print 'nmstats revision', revision
+  print 'nmstats is part of netmeterd'
+  print 'Copytight: Alberto Garcia Hierro and Ayoze Roberto Bernardo'
+  print 'Usage:',os.path.basename(sys.argv[0]),'[options]'
+  print 'Available options are:'
+  print '-i:    Interfaces to generate stats (interface1,interface2,...)'
+  print '-l:    Netmeterd logdir (defaults to /var/log/netmeterd)'
+  print '-o:    Output this for the HTML (defaults to .)'
+  print '-d:    Date specification in the form day/month/year-day/month/year'
+  print '       Values "today", "month", and "year" are also accepted'
+  print '-t:    HTML template (defaults to "default")'
+  print '-T:    Template dir (defaults to /usr/share/netmeterd/templates/)'
+  print '-h:    Shows this help'
   pass
 
 
@@ -25,6 +40,8 @@ def getData(date,interfaces,logdir):
   #Init the dict
   ifaces = {}
   buf = ""
+  if logdir[-1] == '/':
+    logdir = logdir[:-1]
   for char in interfaces:
     if char != ',':
       buf += char
@@ -64,14 +81,16 @@ def getData(date,interfaces,logdir):
       fd = 0
 
     if fd:
-        
+    
+      print 'Parsing:',logdir+'/log-'+str(stMonth)+'-'+str(stYear)    
       if stMonth == endMonth and stYear == endYear:
         limitDay = endDay
       for line in fd.readlines():
         day = int(line.split()[0])
         iface = line.split()[1]
         if day >= stDay <= limitDay and ifaces.has_key(iface):
-          ifaces[iface][day] = line.split()[2:]
+          ifaces[iface][str(day)+'-'+str(stMonth)+'-'\
+          +str(stYear)] = line.split()[2:]
     
     stDay = 1
     stMonth += 1
@@ -82,6 +101,8 @@ def getData(date,interfaces,logdir):
   return ifaces
   pass
 
+def createHTML(ifaces,templatedir,template,outdir):
+  pass
 
 def main():
 
@@ -89,7 +110,9 @@ def main():
   date=""
   interfaces=""
   logdir='/var/log/netmeterd/'
+  template='default'
   templatedir='/usr/share/netmeterd/templates/'
+  outdir='.'
   
   #Parse command line
   try:
@@ -102,20 +125,21 @@ def main():
     switch, value = option
     if switch == '-d' and value != '': date = value
     elif switch == '-l' and value != '': logdir = value
+    elif switch == '-o' and value != '': outdir = value
     elif switch == '-i' and value != '': interfaces = value
     elif switch == '-t' and value != '': template = value
     elif switch == '-T' and value != '': templatedir = value
     elif switch == '--help' or switch == '-h': help()
       
   if not interfaces or not date:
-    print "You must specify one interface and one date range at least"
+    print 'You must specify one interface and one date range at least'
     help()
     sys.exit(1)
 
   ifaces = getData(date,interfaces,logdir)
   print ifaces
 
-if __name__ == "__main__" :
+if __name__ == '__main__' :
   main()
   
 
