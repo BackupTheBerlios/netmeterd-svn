@@ -1,29 +1,27 @@
 #ifndef _IFACE_H
 #define _IFACE_H
 
+#include <string>
 
-class iface:
+struct Date
+{
+  int day, month, year;
+};
+
+using namespace std;
+
+class iface
 {  
   public:
-    iface(const char** name, const ifdata & data);
-    iface(const iface & source);
-    ~iface();
-    ifdata gettotal();
-    ifdata getdaily();
-    ifdata getweekly();
-    ifdata getmonthly();
-    ifdata getyearly();
-    void settotal(const ifdata & data);
-    void setdaily(const ifdata & data);
-    void setweekly(const ifdata & data);
-    void setmonthly(const ifdata & data);
-    void setyearly(const ifdata & data);
+    iface(const string &, const counter &, const Date &);
+    //iface(const string &, const uint &, const sint &, const uint &, const sint &, const int &, const int &, const int &);
+    iface(const iface &);
+    iface();
+    //~iface();
   private:
-    ifdata total;
-    ifdata daily;
-    ifdata weekly;
-    ifdata monthly
-    ifdata yearly;
-}
-  
+    char *name;
+    counter count;
+    Date date;
+}   
+#endif  
   

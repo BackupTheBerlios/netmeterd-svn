@@ -3,46 +3,41 @@
 #include "counter.h"
 #include <cmath>
 
-//char *units[]= { "Bytes","Kilobytes","Megabytes","Gigabytes", "Terabytes","Petabytes","Hexabytes"};
+#include <iostream>
 
-counter::counter(double count, short int unit)
+counter::counter(double theup, sint theupunit, double thedown, sint thedownunit)
 {
-  Count = count;
-  Unit = unit;
-  if (Count >= 1024) reduce();
+  up = theup;
+  upunit = theupunit;
+  down = thedown;
+  downunit = thedownunit;
+  
+  if (up >= 1024 || down >= 1024) reduce();
 }
-    
+
+counter::counter()
+{
+  up = down = 0;
+  upunit = downunit = 0;
+}
+
 counter::counter(const counter &source)
 {
-  counter(source.count(),source.unit());
+  counter(source.up,source.upunit,source.down,source.downunit);
 }
 
-double counter::count() const
-{
-  return Count;
-}
-
-short int counter::unit() const
-{
-  return Unit;
-}
-
-void counter::setCount(const double &count)
-{
-  Count = count;
-}
-
-void counter::setUnit(const short int &unit)
-{
-  Unit = unit;
-}
 
 void counter::reduce()
 {
-  while (Count >= 1024)
+  while (up >= 1024 && upunit <= counter::HB)
   {
-    Count/=1024;
-    Unit++;
+    up/=1024;
+    upunit++;
+  }
+  while (down >= 1024 && downunit <= counter::HB)
+  {
+    down/=1024;
+    downunit++;
   }
 }
 
@@ -50,24 +45,42 @@ void counter::reduce()
 counter counter::operator+(const counter &add) 
 {
   counter aux;
-  if (count() == add.count())
+  //First, the up
+  if (upunit == add.upunit)
   {
-    aux.Count = count()+add.count();
-    aux.Unit = unit();
+    aux.up = up+add.up;
+    aux.upunit = upunit;
   }
   else
-    if (count () > add.count())
+    if (upunit > add.upunit)
     {
-      aux.Count= count()*pow(1024,(count()-add.count()))+add.count();
-      aux.Unit = add.unit();
+      aux.up = up*pow(1024,(upunit-add.upunit))+add.up;
+      aux.upunit = add.upunit;
     }
     else
     {
-      aux.Count =count()+add.count()*pow(1024,(add.count()-count()));
-      aux.Unit = unit();
+      aux.up = up+add.up*pow(1024,(add.upunit-upunit));
+      aux.upunit = upunit;
+    }
+  //Now the down
+  if (downunit == add.downunit)
+  {
+    aux.down = up+add.down;
+    aux.downunit = downunit;
+  }
+  else
+    if (downunit > add.downunit)
+    {
+      aux.down = down*pow(1024,(downunit-add.downunit))+add.down;
+      aux.downunit = add.downunit;
+    }
+    else
+    {
+      aux.down = down+add.down*pow(1024,(add.downunit-downunit));
+      aux.downunit = downunit;
     }
   
-  if (aux.count() >= 1024)
+  if (aux.upunit >= 1024 || aux.downunit >= 1024)
     aux.reduce();
   return aux;
 }
@@ -77,9 +90,7 @@ counter counter::operator=(const counter &source)
   return counter(source);
 }
 
-std::ostream & operator<<(std::ostream &out, const counter &rhs)
+void counter::print()
 {
-  out << rhs.count() << " unidad: " << rhs.unit();
-  return out;
+  std::cout << "Up: " << up << "\nDown: " << down << "\nUpunit " << upunit << "\nDownunit: " << downunit << "\n";
 }
-
