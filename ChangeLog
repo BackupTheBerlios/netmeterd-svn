@@ -1,4 +1,8 @@
 *2004-05-03 Skyhusker
+  Redefined ifdata for use counter class (ok, i was bored this afternoon)
+
+*2004-05-03 Skyhusker
   Initial import
   Class ifdata implemented
   Ayoze joined
+

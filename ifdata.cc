@@ -1,86 +1,61 @@
+//$Id$
+
 #include "ifdata.h"
-#include <math.h>
 
-ifdata::ifdata(double prevup, double prevdown, int prevunit)
+
+ifdata::ifdata(counter sup, counter sdown)
 {
-  while ( up > 1024 && down > 1024 && unit <= ifdata::GIGABYTES)
-  {
-    up /= 1024;
-    down /= 1024;
-    unit++;
-  }
-  
-  up = prevup;
-  down = prevdown;
-  unit = prevunit;
+  Up = sup;
+  Down = sdown;
 }
 
-ifdata::ifdata(const ifdata & source)
+ifdata::ifdata(const ifdata &source)
 {
-  up = source.up;
-  down = source.down;
-  unit = source.unit;
+  ifdata(source.up(), source.down());
 }
 
-void ifdata::setup(const double & prevup)
+void ifdata::setUp(const counter &sup)
 {
-  up = prevup;
+  Up = sup;
 }
 
-void ifdata::setdown(const double & prevdown)
+void ifdata::setDown(const counter &sdown)
 {
-  down = prevdown;
+  Down = sdown;
 }
 
-void ifdata::setunit(const int & prevunit)
+counter ifdata::up()
 {
-  unit = prevunit;
+  return Up;
 }
 
-double ifdata::getup()
+counter ifdata::up() const
 {
-  return up;
+  return up();
 }
 
-double ifdata::getdown()
+counter ifdata::down()
 {
-  return down;
+  return Down;
 }
 
-int ifdata::getunit()
+counter ifdata::down() const
 {
-  return unit;
+  return down();
 }
 
-const ifdata ifdata::operator+(const ifdata & add)
+const ifdata ifdata::operator+(const ifdata &add)
 {
-  ifdata aux;
-  
-  if (unit == add.unit)
-  {
-    aux.up = up + add.up;
-    aux.down = down + add.down;
-    aux.unit = unit;
-  }
-  else 
-    if ( unit < add.unit)
-    {
-      aux.up = up + add.up * pow(1024, add.unit - unit);
-      aux.down = down + add.down * pow(1024, add.unit - unit);
-      aux.unit = add.unit;
-    }
-    else
-      if ( add.unit < unit)
-      {
-        aux.up = up + add.up * pow(1024, unit - add.unit);
-        aux.down = down + add.down * pow(1024, unit - add.unit);
-        aux.unit = unit;
-      }
-  return aux;
+  return ifdata(up()+add.up(),down()+add.down());
 }
         
-const ifdata ifdata::operator=(const ifdata & source)
+const ifdata ifdata::operator=(const ifdata &source)
 {
   return ifdata(source);
 }
 
+std::ostream & operator<<(std::ostream &out, const ifdata &rhs)
+{
+  out << "Up: " << rhs.up() << std::endl << "Down: " << rhs.down();
+  return out;
+}

@@ -1,26 +1,30 @@
+//$Id$
+
 #ifndef _IFDATA_H
 #define _IFDATA_H
+
+#include "counter.h"
 
 
 class ifdata
 {
+  friend std::ostream & operator<<(std::ostream & out, const ifdata &rhs);
+  
   public:
-    enum units { BYTES, KILOBYTES, MEGABYTES, GIGABYTES};
     
-    ifdata(double prevup=0, double prevdown=0, int prevunit=0);
+    ifdata(counter sup, counter sdown);
     ifdata(const ifdata & source);
-    ~ifdata();
-    void setup(const double & prevup);
-    void setdown(const double & prevdown);
-    void setunit(const int & prevunit);
-    double getup();
-    double getdown();
-    int getunit();
+    //~ifdata();
+    void setUp(const counter & sup);
+    void setDown(const counter & sdown);
+    counter up();
+    counter up() const;
+    counter down();
+    counter down() const;
     const ifdata operator+(const ifdata & add);
     const ifdata operator=(const ifdata & source);
   private:
-    double up;
-    double down;
-    int unit;
+    counter Up;
+    counter Down;
 };
 #endif
