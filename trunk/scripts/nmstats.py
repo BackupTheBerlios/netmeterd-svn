@@ -2,13 +2,25 @@
 
 #$Id$
 
-import sys,getopt,exceptions
+import sys,getopt,exceptions,time
 
 def help():
   pass
 
 
-def getData(date,interfaces):
+def isAfter(refDay,refMonth,refYear,day,month,year):
+  if year > refYear: return True
+  elif year < refYear: return False
+  else:
+    if month > refMonth: return True
+    elif month < refMonth: return False
+    else:
+      if day > refDay: return True
+      else: return False
+  pass
+
+
+def getData(date,interfaces,logdir):
   
   #Init the dict
   ifaces = {}
@@ -21,33 +33,51 @@ def getData(date,interfaces):
       buf = ""
   ifaces[buf] = {}
   
-  limitday = 31 #Do you know any month with more than 31 days? 
-  tmpday, tmpmonth, tmpyear = tuple(date.split('-')[0].split('/'))
-  day1, month1, year1 = int(tmpday), int(tmpmonth), int(tmpyear)
-  tmpday, tmpmonth, tmpyear = tuple(date.split('-')[1].split('/'))
-  day2, month2, year2 = int(tmpday), int(tmpmonth), int(tmpyear)
-  
-  while day1 != day2 or month1 != month2 or year1 != year2:
+  if not date in ('today','month','year'):
     try:
-      fd = open(logpath+'/log-'+str(month1)+'-'+str(year1))
+      tmpDay, tmpMonth, tmpYear = tuple(date.split('-')[0].split('/'))
+      stDay, stMonth, stYear = int(tmpDay), int(tmpMonth), int(tmpYear)
+      tmpDay, tmpMonth, tmpYear = tuple(date.split('-')[1].split('/'))
+      endDay, endMonth, endYear = int(tmpDay), int(tmpMonth), int(tmpYear)
+    except:
+      print 'Please, specify a correct date in the form'
+      print 'day/month/year-day/month/year or today or month or year'
+      print 'i.e. 1/1/1983-25/5/1985'
+      sys.exit(1)
+  else:
+    stYear, stMonth, stDay = endYear, endMonth, endDay = \
+    time.gmtime()[:3]
+    if date == 'month':
+      stDay = 1
+      endDay = 31
+    elif date == 'year':
+      stDay = 1
+      endDay = 31
+      stMonth = 1
+      endMonth = 12
+            
+  while not isAfter(endDay,endMonth,endYear,stDay,stMonth,stYear):
+    limitDay = 31 #Do you know any month with more than 31 days? 
+    try:
+      fd = open(logdir+'/log-'+str(stMonth)+'-'+str(stYear))
     except:
       fd = 0
 
     if fd:
-      print 'existe'
-      if month1 == month2 and year1 == year2:
-        limitday == day2
+        
+      if stMonth == endMonth and stYear == endYear:
+        limitDay = endDay
       for line in fd.readlines():
-        day = int(line.split[0])
+        day = int(line.split()[0])
         iface = line.split()[1]
-        if day >= day1 <= limitday and ifaces.has_key(iface):
+        if day >= stDay <= limitDay and ifaces.has_key(iface):
           ifaces[iface][day] = line.split()[2:]
-
-    day1 = 1
-    month1 += 1
-    if month1 > 12:
-      month1 = 1
-      year1 += 1 
+    
+    stDay = 1
+    stMonth += 1
+    if stMonth > 12:
+      stMonth = 1
+      stYear += 1 
   
   return ifaces
   pass
@@ -66,7 +96,6 @@ def main():
     options, notUsed = getopt.getopt(sys.argv[1:],'d:l:i:t:T:','help')
   except getopt.GetoptError:    
     help()
-    print 'mierda'
     sys.exit(1)
   
   for option in options:
@@ -78,12 +107,12 @@ def main():
     elif switch == '-T' and value != '': templatedir = value
     elif switch == '--help' or switch == '-h': help()
       
-  if not interfaces:# or not date:
+  if not interfaces or not date:
     print "You must specify one interface and one date range at least"
     help()
     sys.exit(1)
 
-  ifaces = getData(date,interfaces)
+  ifaces = getData(date,interfaces,logdir)
   print ifaces
 
 if __name__ == "__main__" :
