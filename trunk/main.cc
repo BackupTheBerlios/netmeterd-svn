@@ -20,6 +20,7 @@ int main(int arg, char **argv){
     a.update();
   }
   a.save(access);
+  cout << a << endl;
   return 0;
   
 }
