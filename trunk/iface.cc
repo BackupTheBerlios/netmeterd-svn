@@ -8,7 +8,15 @@
 
 #include "iface.h"
 
-#include <iostream>
+
+#ifndef LOGDIR
+  #define LOGDIR "/var/log/netmeterd"
+#endif
+
+
+//Static members
+string iface::logdir=".";
+
 
 string trim(string str)
 {
@@ -19,12 +27,9 @@ string trim(string str)
 
 string itoa(const int &x)
 {
-  /*stringstream buf;
-  buf << x << ends;
-  return buf.str();*/
-  char buf[512];
-  sprintf(buf,"%d",x);
-  return static_cast<string> (buf);
+  stringstream buf;
+  buf << x;
+  return buf.str();
 }
 
 string Unit(const sint &x)
@@ -49,6 +54,7 @@ sint Unit(const string &str)
   
   return -1;
 }
+
 
 iface::iface(const string &thename, const counter &thecount, const Date &thedate)
 {
@@ -84,16 +90,14 @@ iface::iface()
   iface("");
 }
 
-bool iface::load(const Method &access)
+bool iface::load()
 {
   string buf,path;
   int pos;
   
-  if (access.type == FS)
-    path = access.data+"/log-"+itoa(date.month)+'-'+itoa(date.year);
+  path = logdir+"/log-"+itoa(date.month)+'-'+itoa(date.year);
   
   if ((pos = ifind(path)) < 0) return true;
-  cout << "Loadpos: " << pos << endl;
   ifstream fd (path.c_str());
   fd.seekg(pos);
   fd >> *this;
@@ -101,32 +105,30 @@ bool iface::load(const Method &access)
   return true;
 }
 
-bool iface::save(const Method &access)
+bool iface::save()
 {
   string path;
   int pos;
   fstream fd;
-  
-  if (access.type == FS)
-    path = access.data+"/log-"+itoa(date.month)+'-'+itoa(date.year);
-    pos = ifind(path);
-    cout << "Savepos: " << pos << endl;
-    if (pos >= 0)
-    {
-      fd.open(path.c_str(),ios::in|ios::out);
-      fd.seekp(pos);
-      fd << *this << endl;
-    }
+
+  path = logdir+"/log-"+itoa(date.month)+'-'+itoa(date.year);
+  pos = ifind(path);
+  if (pos >= 0)
+  {
+    fd.open(path.c_str(),ios::in|ios::out);
+    fd.seekp(pos);
+    fd << *this << endl;
+  }
+  else
+  {
+    if (pos == -1)
+      fd.open(path.c_str(),ios::out|ios::app);
     else
-    {
-      if (pos == -1)
-        fd.open(path.c_str(),ios::out|ios::app);
-      else
-        fd.open(path.c_str(),ios::out);
-      fd << *this << endl;
-    }
-    fd.close();
- 
+      fd.open(path.c_str(),ios::out);
+    fd << *this << endl;
+  }
+  fd.close();
+  
   return true;
 }
 int iface::ifind(const string &path)
@@ -141,10 +143,7 @@ int iface::ifind(const string &path)
     pos = fd.tellg();
     std::getline(fd,buf);
     if ( buf.find(itoa(date.day),0) != string::npos  && buf.find(name,0) != string::npos) //We've got it
-    {
-      cout << pos << endl;
       return pos;
-    }
   }
  //We haven't find the iface :-(  
   fd.close();
@@ -220,17 +219,14 @@ void iface::update()
     if (count.getUp() >= 1024 || count.getDown() >= 1024);
       count.reduce();
   }
+  
   lastUp = bytesup;
   lastDown = bytesdown;
-  if (shouldRenew())
-  {
-    //save();
-    //reset();
-  }
-
+  
+  renew();
 }
 
-bool iface::shouldRenew()
+bool iface::renew()
 {
   time_t mytime;
   struct tm *times;
@@ -238,6 +234,11 @@ bool iface::shouldRenew()
   times = localtime(&mytime);
   if (date.day != times->tm_mday || date.month != times->tm_mon || date.year != times->tm_year+1900)
   {  
+    save();
+    date.day = times->tm_mday;
+    date.month = times->tm_mon;
+    date.year = times->tm_year+1900;
+    count.reset();
     return true;
   }
 

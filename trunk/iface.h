@@ -41,32 +41,27 @@ class iface
     iface(const string &);
     iface();
     //~iface();
-    bool load(const Method &);
+    bool load();
     //Modifies: Load the iface initial values using the supplied method
     //Returns: True on success or false on error
-    bool save(const Method &);
+    bool save();
     //Modifies: Saves the data using the supplied method
     //Returns: True on success or false on error
     int ifind(const string &);
     //Modifies: Nothing
     //Returns: the position of teh interface in the file or -1 is not found
-    bool write(const string &, const  int &);
-    //Modifies: Writes the counter values to a file ina determinated position
-    //Returns:True on success, false on error
     void update();
     //Modifies: Updates the counter from /proc/net/dev or /sys/class/net/dev
     //Returns: Nothing
-    bool shouldRenew();
-    //Checks if day has changed and the counter need to be renewed
-    void reset();
-    //Puts the counter to 0
+    bool renew();
+    //Checks if day has changed and then, resets count and date
   private:
     string name;
     counter count;
     double lastUp;
     double lastDown;
     Date date;
-    static Method access;
+    static string logdir;
 };   
 #endif  
   
