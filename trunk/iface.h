@@ -44,7 +44,6 @@ class iface
     //Puts the counter to 0
   private:
     string name;
-    double lastUp,lastDown;
     counter count;
     double lastUp;
     double lastDown;
