@@ -41,6 +41,6 @@ install:
 
 dist:
 	mkdir $(RELNAME)
-	cp *.cc *.h LICENSE ChangeLog Makefile $(RELNAME)
+	cp *.cc *.h LICENSE ChangeLog Makefile README $(RELNAME)
 	tar cvvjf $(RELNAME).tar.bz2 $(RELNAME)
 	${RM} -r $(RELNAME)
