@@ -5,36 +5,38 @@
 #include <cstdlib>
 #include <vector>
 #include <sstream>
+#include <cstdio>
 
 #include "iface.h"
 
+#include <iostream>
 
 #ifndef LOGDIR
-  #define LOGDIR "/var/log/netmeterd"
+  #define LOGDIR "/var/log/netmeterd/"
 #endif
 
 
 //Static members
-string iface::logdir=".";
+std::string iface::logdir=".";
 
 
-string trim(string str)
+std::string trim(std::string str)
 {
   while (str[str.size()-1]==' ') str=str.substr(0,str.size()-2);
   while (str[0]==' ') str=str.substr(1,str.size()-1);
   return str;
 }
 
-string itoa(const int &x)
+std::string itoa(const int &x)
 {
-  stringstream buf;
+  std::stringstream buf;
   buf << x;
   return buf.str();
 }
 
-string Unit(const sint &x)
+std::string Unit(const sint &x)
 {
-  vector <string> units(7);
+  std::vector <std::string> units(7);
   units[0]="B";units[1]="KB";units[2]="MB";units[3]="GB";
   units[4]="TB";units[5]="PB";units[6]="HB";
   if (x < sint(units.size()))
@@ -42,9 +44,9 @@ string Unit(const sint &x)
   return "E";
 }
 
-sint Unit(const string &str)
+sint Unit(const std::string &str)
 {
-  vector <string> units(7);
+  std::vector <std::string> units(7);
   units[0]="B";units[1]="KB";units[2]="MB";units[3]="GB";
   units[4]="TB";units[5]="PB";units[6]="HB";
 
@@ -56,33 +58,34 @@ sint Unit(const string &str)
 }
 
 
-iface::iface(const string &thename, const counter &thecount, const Date &thedate)
+iface::iface(const std::string &name, \
+            const counter &count, const Date &date)
 {
-  name = thename;
-  count = thecount;
-  date = thedate;
+  this->name = name;
+  this->count = count;
+  this->date = date;
 }
 
-iface::iface(const string &thename)
+iface::iface(const std::string &name)
 {
-  name = thename;
-  count = counter(0,0,0,0);
+  this->name = name;
+  //count = counter(0,0,0,0);
   time_t mytime;
   struct tm *times;
   time(&mytime);
   times = localtime(&mytime);
-  date.day = times->tm_mday;
-  date.month = times->tm_mon;
-  date.year = times->tm_year+1900;
-  lastUp = lastDown = 0;
+  this->date.day = times->tm_mday;
+  this->date.month = times->tm_mon;
+  this->date.year = times->tm_year+1900;
+  this->lastUp = this->lastDown = 0;
 
 }
 
 iface::iface(const iface &source)
 {
-  name = source.name;
-  count = source.count;
-  date = source.date;
+  this->name = source.name;
+  this->count = source.count;
+  this->date = source.date;
 }
 
 iface::iface() 
@@ -92,13 +95,14 @@ iface::iface()
 
 bool iface::load()
 {
-  string buf,path;
+  std::string buf,path;
   int pos;
   
-  path = logdir+"/log-"+itoa(date.month)+'-'+itoa(date.year);
+  path = this->logdir+"/log-"+itoa(this->date.month)+'-'+ \
+          itoa(this->date.year);
   
-  if ((pos = ifind(path)) < 0) return true;
-  ifstream fd (path.c_str());
+  if ((pos = this->ifind(path)) < 0) return true;
+  std::ifstream fd (path.c_str());
   fd.seekg(pos);
   fd >> *this;
   fd.close();
@@ -107,42 +111,74 @@ bool iface::load()
 
 bool iface::save()
 {
-  string path;
-  int pos;
-  fstream fd;
+  std::string path,buf;
+  std::fstream fd;
+  int pos, endpos;
 
-  path = logdir+"/log-"+itoa(date.month)+'-'+itoa(date.year);
-  pos = ifind(path);
+  path = this->logdir+"/log-"+itoa(this->date.month)+ \
+        '-'+itoa(this->date.year);
+  pos = this->ifind(path);
   if (pos >= 0)
   {
-    fd.open(path.c_str(),ios::in|ios::out);
+    fd.open(path.c_str(),std::ios::in|std::ios::out);
+    if(!fd) return false;
     fd.seekp(pos);
-    fd << *this << endl;
+    std::getline(fd,buf);
+    endpos = fd.tellp();
+    srand(static_cast<unsigned>(time(0)));
+    std::string tmppath = this->logdir+"/tempfile-"+itoa(rand());
+    std::ofstream tmp(tmppath.c_str());
+    //This not represents a risk, since logdir should be writable
+    //only by the user who owns the process
+    fd.seekp(std::ios::beg);
+    while (int(tmp.tellp())!= pos)
+    {
+      std::getline(fd,buf);
+      if (buf!="\n")
+        tmp << buf << std::endl;
+    }
+    tmp << *this << std::endl;
+    fd.seekp(endpos);
+    for (int i=0;!fd.eof();i++)
+    {
+      //Avoid the last \n
+      if (i>0) tmp << std::endl;
+      std::getline(fd,buf);
+      tmp << buf;
+    }
+    tmp.close();
+    remove(path.c_str());
+    rename(tmppath.c_str(),path.c_str());
   }
   else
   {
     if (pos == -1)
-      fd.open(path.c_str(),ios::out|ios::app);
+      fd.open(path.c_str(),std::ios::out|std::ios::app);
     else
-      fd.open(path.c_str(),ios::out);
-    fd << *this << endl;
+      fd.open(path.c_str(),std::ios::out);
+    
+    if(!fd) return false;
+    
+    fd << *this << std::endl;
   }
+  
   fd.close();
   
   return true;
 }
-int iface::ifind(const string &path)
+int iface::ifind(const std::string &path)
 {
-  string buf;
+  std::string buf;
   int pos;
-  ifstream fd(path.c_str());
-  fd.seekg(ios::beg);
+  std::ifstream fd(path.c_str());
+  fd.seekg(std::ios::beg);
   if (!fd) return -2; //File not found
   while (!fd.eof())
   {
     pos = fd.tellg();
     std::getline(fd,buf);
-    if ( buf.find(itoa(date.day),0) != string::npos  && buf.find(name,0) != string::npos) //We've got it
+    if ( buf.find(itoa(this->date.day),0) != std::string::npos  \
+        && buf.find(this->name,0) != std::string::npos) //We've got it
       return pos;
   }
  //We haven't find the iface :-(  
@@ -159,19 +195,19 @@ void iface::update()
 #ifdef LINUX26
 // Implemetation using /sys/class/net
   
-  string aux,path;
-  path = "/sys/class/net/"+name+"/statistics/tx_bytes";
-  ifstream fd (path.c_str());
+  std::string buf,path;
+  path = "/sys/class/net/"+this->name+"/statistics/tx_bytes";
+  std::ifstream fd (path.c_str());
   if (fd)
   {
-    fd >> aux;
+    fd >> buf;
     fd.close();
-    bytesup = atof(aux.c_str());
-    path = "/sys/class/net/"+name+"/statistics/rx_bytes";
-    fd.open(path.c_str(),ios::in);
-    fd >> aux;
+    bytesup = atof(buf.c_str());
+    path = "/sys/class/net/"+this->name+"/statistics/rx_bytes";
+    fd.open(path.c_str(),std::ios::in);
+    fd >> buf;
     fd.close();
-    bytesdown = atof(aux.c_str());
+    bytesdown = atof(buf.c_str());
   }
   else { bytesup=bytesdown=0;}
 #else
@@ -179,11 +215,11 @@ void iface::update()
 // Implementation using /proc/net/dev
 
   int line=0,j=1;
-  string temp,dev;
+  std::string temp,dev;
   double number=0;
   bool was_space=true,found=false;
   
-  fstream file ("/proc/net/dev", ios::in );
+  std::ifstream file ("/proc/net/dev", std::ios::in );
   while (getline(file,temp)) { //read data from file
     if (line>=2) { //First 2 lines are headers
 
@@ -215,9 +251,9 @@ void iface::update()
   if ( bytesup && bytesdown && lastUp && lastDown)
   {
     counter tmp(bytesup-lastUp,0,bytesdown-lastDown,0);
-    count+=tmp;
-    if (count.getUp() >= 1024 || count.getDown() >= 1024);
-      count.reduce();
+    this->count+=tmp;
+    if (this->count.getUp() >= 1024 || this->count.getDown() >= 1024);
+      this->count.reduce();
   }
   
   lastUp = bytesup;
@@ -232,20 +268,21 @@ bool iface::renew()
   struct tm *times;
   time(&mytime);
   times = localtime(&mytime);
-  if (date.day != times->tm_mday || date.month != times->tm_mon || date.year != times->tm_year+1900)
+  if (this->date.day != times->tm_mday || this->date.month != times->tm_mon \
+      || this->date.year != times->tm_year+1900)
   {  
-    save();
-    date.day = times->tm_mday;
-    date.month = times->tm_mon;
-    date.year = times->tm_year+1900;
-    count.reset();
+    this->save();
+    this->date.day = times->tm_mday;
+    this->date.month = times->tm_mon;
+    this->date.year = times->tm_year+1900;
+    this->count.reset();
     return true;
   }
 
   return false;
 }
 
-ostream &operator<<(ostream &out,const iface &oface)
+std::ostream &operator<<(std::ostream &out,const iface &oface)
 {
  out << oface.date.day << " " << oface.name << " "
  << oface.count.getUp() << " " << Unit(oface.count.getUpUnit())
@@ -254,9 +291,9 @@ ostream &operator<<(ostream &out,const iface &oface)
  return out;
 }
 
-istream &operator>>(istream &in, iface &inface)
+std::istream &operator>>(std::istream &in, iface &inface)
 {
-  string buf0,buf1,buf2,buf3,buf4;
+  std::string buf0,buf1,buf2,buf3,buf4;
   in >> buf0 >>  inface.name >> buf1 
   >> buf2 >> buf3 >> buf4;
   inface.count.setUp(atof(buf1.c_str()));
