@@ -59,12 +59,12 @@ void iface::update()
   ifstream f (path.c_str());
   f >> aux;
   f.close();
-  bytesup = atof(aux);
+  bytesup = atof(aux.c_str());
   path = "/sys/class/net/"+name+"/statistics/tx_bytes";
-  f.open(path.c_str()||ios::in);
+  f.open(path.c_str(),ios::in);
   f >> aux;;
   f.close();
-  bytesdown = atof(aux);
+  bytesdown = atof(aux.c_str());
   
 #else
 // Implementation using /proc/net/dev

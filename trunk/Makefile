@@ -1,5 +1,17 @@
+CXX = g++
+SOURCES = counter.o iface.o main.cc
+EXE = main
+KERNEL_VERSION = $(shell uname -r|cut -d. -f 1-2)
+
+ifeq ($(KERNEL_VERSION),2.6)
+  CXXFLAGS+= -DLINUX26
+endif
+
+$(EXE): $(SOURCES)
+	$(CXX) $(CXXFLAGS) $^ -o $@
+
+
 .PHONY: all clean
-all: main
-main: iface.o counter.o
+all: $(EXE)
 clean: 
-	${RM} main *.o
+	${RM} $(EXE) *.o
