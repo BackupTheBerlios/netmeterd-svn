@@ -1,4 +1,4 @@
-VERSION = "\"0.1\""
+VERSION = 0.1
 EXE = netmeterd
 RELNAME = $(EXE)-$(VERSION)
 CXX = g++
@@ -11,7 +11,7 @@ ifeq ($(KV),2.6)
 endif
 
 ifeq ($(LOGDIR),)
-	LOGDIR = "\"/var/log/netmeterd\""
+	LOGDIR = /var/log/netmeterd/
 endif
 
 ifeq ($(INSDIR),)
@@ -26,10 +26,10 @@ clean:
 	${RM} $(EXE) *.o *~
 
 iface.o: iface.cc
-	$(CXX) -c $(CXXFLAGS) -DLOGDIR=$(LOGDIR) $^ -o $@
+	$(CXX) -c $(CXXFLAGS) -DLOGDIR="\"$(LOGDIR)\"" $^ -o $@
 	
 $(EXE): $(SOURCES)
-	$(CXX) $(CXXFLAGS) -DVERSION=$(VERSION) -DLOGDIR=$(LOGDIR) $^ -o $@
+	$(CXX) $(CXXFLAGS) -DVERSION=\"$(VERSION)\" -DLOGDIR=\"$(LOGDIR)\" $^ -o $@
 
 install:
 	install -d $(LOGDIR)
