@@ -5,33 +5,38 @@
 
 import getopt,exceptions,sys,os,time
 
-units = {0: 'B',1: 'KB',2: 'MB', 3: 'GB', \
-          4: 'TB', 5: 'PB', 6: 'HB', 'B': 0, \
-          'KB': 1, 'MB': 2, 'GB': 3, 'TB': 4,
-          'PB': 5, 'HB': 6 }
 
 
 class counter:
+  units = {0: 'B',1: 'KB',2: 'MB', 3: 'GB', \
+          4: 'TB', 5: 'PB', 6: 'HB', 'B': 0, \
+          'KB': 1, 'MB': 2, 'GB': 3, 'TB': 4,
+          'PB': 5, 'HB': 6 }
+  
   def __init__(self,count=0,unit=0):
     self.count = count
     try:
       unit.isdigit()
-      self.unit = units[unit]
+      self.unit = counter.units[unit]
     except:
       self.unit = unit
   def __str__(self):
-    return str(self.count)+' '+str(self.unit)
+    return self.__repr__
   def __repr__(self):
-    return str(self.count)+' '+str(self.unit)
+    return str(self.count)+' '+str(counter.units[self.unit])
   def __eq__(self,other):
     if self.count == other.count and \
         self.unit == other.unit: return True
     return False
   def __gt__(self,other):
     if self.unit == other.unit:
-      return self.counter > other.counter
-    elif self.unit < other.unit:
-      return
+      return self.count > other.count
+    elif self.unit > other.unit:
+      return self.count/(1024**other.unit-self.unit) > other.count
+    elif other.unit > self.unit:
+      return self.count > other.count/(1024**other.unit-self.unit)
+  def __lt__(self,other):
+    return not self.__gt__(other)
     
 
 
@@ -126,8 +131,9 @@ def getData(date,interfaces,logdir):
         day = int(line.split()[0])
         iface = line.split()[1]
         if day >= stDay <= limitDay and ifaces.has_key(iface):
-          ifaces[iface][str(day)+'-'+str(stMonth)+'-'\
-          +str(stYear)] = line.split()[2:]
+          ifaces[iface][str(day)+'-'+str(stMonth)+'-'+str(stYear)] = \
+          [counter(line.split()[2],line.split()[3]),\
+          counter(line.split()[4],line.split()[5])]
     
     stDay = 1
     stMonth += 1
@@ -138,37 +144,19 @@ def getData(date,interfaces,logdir):
   return ifaces
   pass
 
-def expandVal(pair):
-  val = float(pair[0])
-   
-  if pair[1] == 'B': pow=-2
-  elif pair[1] == 'KB': pow=-1
-  elif pair[1] == 'MB': pow=0
-  elif pair[1] == 'GB': pow=1
-  elif pair[1] == 'TB': pow=2
-  elif pair[1] == 'PB': pow=3
-  elif pair[1] == 'HB': pow=4
-  val = val * (1024**pow)
-  
-  return val
-  
 def getTheBiggest(ifaces):
-  value = 0
+  value = counter(0,0)
   for iface in ifaces.keys():
     for date in ifaces[iface].keys():
-      tmpval = expandVal(ifaces[iface][date][:2])
-      if tmpval > value: value=tmpval
-      tmpval = expandVal(ifaces[iface][date][2:]) 
-      if tmpval > value: value=tmpval
+        #if ifaces[iface][date][i] > value:
+        print ifaces[iface][date]
+        #  value = ifaces[iface][date][i]
   return value
       
 def createHTML(ifaces,templatedir,template,outdir,type):
-  
-  
-  
-  
+
   max = getTheBiggest(ifaces)
-  print max
+  #print max
   pass
 
 def main():
