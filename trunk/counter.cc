@@ -58,6 +58,7 @@ counter counter::operator+(const counter &add)
       aux.upunit = add.upunit;
     }
     else
+    if (add.upunit > upunit)
     {
       aux.up = up+add.up*pow(1024,(add.upunit-upunit));
       aux.upunit = upunit;
@@ -65,7 +66,7 @@ counter counter::operator+(const counter &add)
   //Now the down
   if (downunit == add.downunit)
   {
-    aux.down = up+add.down;
+    aux.down = down+add.down;
     aux.downunit = downunit;
   }
   else
@@ -75,10 +76,11 @@ counter counter::operator+(const counter &add)
       aux.downunit = add.downunit;
     }
     else
-    {
-      aux.down = down+add.down*pow(1024,(add.downunit-downunit));
-      aux.downunit = downunit;
-    }
+      if (add.downunit > downunit)
+      {
+        aux.down = down+add.down*pow(1024,(add.downunit-downunit));
+        aux.downunit = downunit;
+      }
   
   if (aux.upunit >= 1024 || aux.downunit >= 1024)
     aux.reduce();
@@ -87,6 +89,7 @@ counter counter::operator+(const counter &add)
 
 void counter::operator=(const counter &source)
 {
+ 
  up = source.up;
  upunit = source.upunit;
  down = source.down;
