@@ -12,6 +12,8 @@ using namespace std;
 //Some usefull functions
 string trim (string);
 string itoa(const int &);
+string Unit(const sint &);
+sint Unit(const string &);
 
 struct Date
 {
