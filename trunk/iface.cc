@@ -4,9 +4,14 @@
 #include <fstream>
 #include <cstdlib>
 #include "iface.h"
-#include "functions.h"
 
 
+string trim(string str)
+{
+  while (str[str.size()-1]==' ') str=str.substr(0,str.size()-2);
+  while (str[0]==' ') str=str.substr(1,str.size()-1);
+  return str;
+}
 
 iface::iface(const string &thename, const counter &thecount, const Date &thedate)
 {
@@ -104,6 +109,7 @@ void iface::update()
   }
   if (!found) { lastDown=0; lastUp=0; }
 #endif
+
   if ( bytesup && bytesdown)
   {
     counter tmp(bytesup-lastUp,0,bytesdown-lastDown,0);

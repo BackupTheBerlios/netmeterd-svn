@@ -9,6 +9,8 @@
 
 using namespace std;
 
+string trim (string);
+
 struct Date
 {
   int day, month, year; //self explanatory
