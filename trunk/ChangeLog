@@ -1,3 +1,7 @@
+*2004-05-09 Skyhusker
+  Class counter redefined
+  Class ifdata will be dropped soon
+
 *2004-05-06 Skyhusker
   Moving to BerliOS (thanks ;-))
   Definitive name decided: our proyect will be called NetMeterd
