@@ -90,6 +90,7 @@ counter counter::operator=(const counter &source)
   return counter(source);
 }
 
+//For debbuging porpouses
 void counter::print()
 {
   std::cout << "Up: " << up << "\nDown: " << down << "\nUpunit " << upunit << "\nDownunit: " << downunit << "\n";

@@ -2,7 +2,10 @@
 
 #include <ctime>
 #include <fstream>
+#include <cstdlib>
 #include "iface.h"
+
+
 
 iface::iface(const string &thename, const counter &thecount, const Date &thedate)
 {
@@ -45,8 +48,24 @@ iface::iface()
 void iface::update()
 {
 
+  double bytesup,bytesdown;
+
+
 #ifdef LINUX26
 // Implemetation using /sys/class/net
+  
+  string aux,path;
+  path = "/sys/class/net/"+name+"/statistics/rx_bytes";
+  ifstream f (path.c_str());
+  f >> aux;
+  f.close();
+  bytesup = atof(aux);
+  path = "/sys/class/net/"+name+"/statistics/tx_bytes";
+  f.open(path.c_str()||ios::in);
+  f >> aux;;
+  f.close();
+  bytesdown = atof(aux);
+  
 #else
 // Implementation using /proc/net/dev
 
@@ -56,13 +75,24 @@ void iface::update()
 
 #endif
 
+  counter tmp(bytesup-lastUp,NULL,bytesdown-lastDown,NULL);
+  count += tmp;
+  lastUp = bytesup;
+  lastDown = bytesdown;
+  if (shouldRenew)
+  {
+    save();
+    reset();
+  }
+
+}
 bool iface::shouldRenew()
 {
   time_t mytime;
   struct tm *times;
   time(&mytime);
   times = localtime(&mytime);
-  if (date.day != times->tm_mday || date.month != times->tm_mon || date.year = times->tm_year)
+  if (date.day != times->tm_mday || date.month != times->tm_mon || date.year != times->tm_year)
   {  
     delete [] times;
     return true;

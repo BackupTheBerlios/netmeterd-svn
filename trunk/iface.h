@@ -43,6 +43,8 @@ class iface
   private:
     string name;
     counter count;
+    double lastUp;
+    double lastDown;
     Date date;
 };   
 #endif  
