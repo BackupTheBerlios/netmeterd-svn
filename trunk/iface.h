@@ -1,8 +1,12 @@
 //$Id$
+
 #ifndef _IFACE_H
 #define _IFACE_H
 
 #include <string>
+#include "counter.h"
+
+using namespace std;
 
 struct Date
 {
@@ -13,7 +17,7 @@ struct method
 {
   sint type; //file or DB
   string data; //path or user:pass@host/db
-}
+};
 
 using namespace std;
 
@@ -37,9 +41,9 @@ class iface
     bool shouldRenew();
     //Checks if day has changed and the counter need to be renewed
   private:
-    char *name;
+    string name;
     counter count;
     Date date;
-}   
+};   
 #endif  
   
