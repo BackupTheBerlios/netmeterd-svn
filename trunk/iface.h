@@ -42,6 +42,7 @@ class iface
     //Checks if day has changed and the counter need to be renewed
   private:
     string name;
+    double lastUp,lastDown;
     counter count;
     double lastUp;
     double lastDown;
