@@ -6,7 +6,6 @@
 import getopt,exceptions,sys,os,time
 
 
-
 class counter:
   units = {0: 'B',1: 'KB',2: 'MB', 3: 'GB', \
           4: 'TB', 5: 'PB', 6: 'HB', 'B': 0, \
@@ -155,6 +154,8 @@ def getTheBiggest(ifaces):
       
 def createHTML(ifaces,templatedir,template,outdir,type):
 
+  #First we load the header and the footer
+  
   max = getTheBiggest(ifaces)
   print max
   pass
