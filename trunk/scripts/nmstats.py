@@ -155,6 +155,11 @@ def getTheBiggest(ifaces):
 def createHTML(ifaces,templatedir,template,outdir,type):
 
   #First we load the header and the footer
+  headername = templatedir+'/'+template+'/header.html'
+  headersize = os.path.getsize(headername)
+  fd = open(headername)
+  theheader = fd.read(headersize)
+  
   
   max = getTheBiggest(ifaces)
   print max
