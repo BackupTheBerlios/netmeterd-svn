@@ -61,17 +61,20 @@ void iface::update()
 // Implemetation using /sys/class/net
   
   string aux,path;
-  path = "/sys/class/net/"+name+"/statistics/rx_bytes";
-  ifstream f (path.c_str());
-  f >> aux;
-  f.close();
-  bytesup = atof(aux.c_str());
   path = "/sys/class/net/"+name+"/statistics/tx_bytes";
-  f.open(path.c_str(),ios::in);
-  f >> aux;
-  f.close();
-  bytesdown = atof(aux.c_str());
-  
+  ifstream f (path.c_str());
+  if (f)
+  {
+    f >> aux;
+    f.close();
+    bytesup = atof(aux.c_str());
+    path = "/sys/class/net/"+name+"/statistics/rx_bytes";
+    f.open(path.c_str(),ios::in);
+    f >> aux;
+    f.close();
+    bytesdown = atof(aux.c_str());
+  }
+  else { bytesup=bytesdown=0;}
 #else
 
 // Implementation using /proc/net/dev
