@@ -122,11 +122,8 @@ bool iface::save(const Method &access)
         fd.open(path.c_str(),ios::out);
       else
         if (pos == -1)
-        {
           fd.open(path.c_str(),ios::out|ios::app);
-          cout << "app" << endl;
-          fd << *this << endl;
-        }
+        fd << *this << endl;
     }
     fd.close();
  
