@@ -62,6 +62,6 @@ const ifdata ifdata::operator=(const ifdata &source)
 
 std::ostream & operator<<(std::ostream &out, const ifdata &rhs)
 {
-  out << "Up: " << rhs.up() << std::endl << "Down: " << rhs.down();
+  out << "Up: " << rhs.up() << '\t' << "Down: " << rhs.down();
   return out;
 }
